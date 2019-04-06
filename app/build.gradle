@@ -1,0 +1,93 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        releaseconfig {
+            keyAlias 'donateazy'
+            keyPassword 'donateazy@123'
+            storeFile file('C:/Users/Admin/Downloads/donateasy/donateazy.jks')
+            storePassword 'donateazy@123'
+        }
+    }
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.dhamodharan.myapplication"
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.releaseconfig
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable false
+            jniDebuggable false
+            signingConfig signingConfigs.releaseconfig
+            renderscriptDebuggable false
+            pseudoLocalesEnabled false
+        }
+    }
+    buildToolsVersion '28.0.3'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    productFlavors {
+    }
+
+    splits {
+
+        // Configures multiple APKs based on ABI.
+        abi {
+
+            enable true
+
+            reset()
+
+            include "x86", "x86_64", "armeabi", "armeabi-v7a", "arm64-v8a", "mips"
+
+            universalApk false
+        }
+
+    }
+
+
+}
+
+
+
+
+ext.abiCodes = ['x86': 1, 'x86_64': 2, 'armeabi': 3, 'armeabi-v7a': 4, 'arm64-v8a': 5, 'mips': 6]
+
+import com.android.build.OutputFile
+
+android.applicationVariants.all { variant ->
+
+    variant.outputs.each { output ->
+
+        def baseAbiVersionCode =
+                // Determines the ABI for this variant and returns the mapped value.
+                project.ext.abiCodes.get(output.getFilter(OutputFile.ABI))
+
+        if (baseAbiVersionCode != null) {
+
+            output.versionCodeOverride =
+                    baseAbiVersionCode * 1000 + variant.versionCode
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+
+    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
+}
